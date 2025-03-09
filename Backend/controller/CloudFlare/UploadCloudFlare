@@ -1,0 +1,45 @@
+const axios = require("axios");
+const FormData = require("form-data");
+const fs = require("fs");
+require("dotenv").config();
+
+const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID; 
+const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN; 
+const CLOUDFLARE_BUCKET_NAME = process.env.CLOUDFLARE_BUCKET_NAME; 
+
+const UPLOAD_URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1`;
+
+/**
+ * Upload un fichier vers Cloudflare Images
+ * @param {string} filePath - Chemin du fichier à uploader
+ * @returns {Promise<string>} URL de l'image uploadée
+ */
+async function uploadToCloudflare(filePath) {
+    try {
+        const fileStream = fs.createReadStream(filePath);
+        const formData = new FormData();
+        formData.append("file", fileStream);
+
+        const response = await axios.post(UPLOAD_URL, formData, {
+            headers: {
+                ...formData.getHeaders(),
+                Authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`
+            }
+        });
+
+        if (response.data.success) {
+            console.log("Upload réussi :", response.data.result.variants[0]);
+            return response.data.result.variants[0]; // URL de l’image optimisée
+        } else {
+            throw new Error("Échec de l'upload : " + JSON.stringify(response.data.errors));
+        }
+    } catch (error) {
+        console.error("Erreur lors de l'upload :", error.message);
+        throw error;
+    }
+}
+
+// Exemple d'utilisation
+// uploadToCloudflare("./image.jpg").then(url => console.log("Image accessible ici :", url));
+
+module.exports = { uploadToCloudflare };

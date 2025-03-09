@@ -1,16 +1,23 @@
 const express = require("express");
-const {insertUser} = require("../controller/userController")
+const {Register,LogIn} = require("../controller/userController")
 const router = express.Router();
 
 // Create a user
-router.post("/", async (req, res) => {
+router.post("/Register", async (req, res) => {
     try{
-        await insertUser(req, res)
+        await Register(req, res)
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-
+// Login
+router.post("/login", async (req, res) => {
+    try {
+        await LogIn(req, res);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 module.exports = router;
