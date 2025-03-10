@@ -89,5 +89,43 @@ const selectPostById = async (req, res) => {
     }
   };
     
-    
-module.exports = { insertPost, selectAllPosts ,selectPostById};
+const updatePost = async(req,res)=>{
+  try{
+const { _id, title, content, Images } = req.body;
+if (!_id || !title || !content || !Images) {
+  return res.status(400).json({ success: false, message: "All fields are required" });
+}
+const updatedPost = await Post.findByIdAndUpdate
+(_id, { title, content, Images }, { new: true });
+res.status(200).json({
+  success: true,
+  message: "Post updated successfully",
+  post: updatedPost
+});
+  }catch(err){
+    console.error("Error updating post:", err);
+    res.status(500).json({
+        message: "Internal server error while updating post"
+    });
+  }
+}   
+const deletePost = async(req,res)=>{
+  try{
+const { _id } = req.body;
+if (!_id) {
+  return res.status(400).json({ success: false, message: "Post ID is required" });
+}
+const deletedPost = await Post.findByIdAndDelete(_id);
+res.status(200).json({
+  success: true,
+  message: "Post deleted successfully",
+  post: deletedPost
+});
+  }catch(err){
+    console.error("Error deleting post:", err);
+    res.status(500).json({
+        message: "Internal server error while deleting post"
+    });
+  }
+}
+module.exports = { insertPost, selectAllPosts ,selectPostById,updatePost,deletePost};
