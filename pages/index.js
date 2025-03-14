@@ -6,6 +6,9 @@ export default function Page() {
     <div>
       <Link href="/users">
       </Link>
+      <br />
+      <Link href="/homepage">
+      </Link>
     </div>
   );
 }
